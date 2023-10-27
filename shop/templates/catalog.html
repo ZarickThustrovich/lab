@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div style="display: flex; justify-content: space-evenly;">
+        {% for book in books %}
+            <div style="background-color: bisque;">
+                <h1>{{ book.name }}</h1>
+                <img src="{{ book.pic_link.url }}" height="400" width="400"/>
+                <h1>Жанр: {{ book.genre }}</h1>
+                <h1>Автор: {{ book.author }}</h1>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
