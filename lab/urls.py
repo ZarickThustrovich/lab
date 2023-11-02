@@ -30,7 +30,9 @@ jwt_url_patterns = [
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('catalog/', views.books_catalog),
+    path('catalog/', views.get_books_catalog),
+    path('get-book/<int:id>', views.get_specific_book),
+    path('get-lot/<int:id>', views.get_specific_lot),
 ]
 
 
