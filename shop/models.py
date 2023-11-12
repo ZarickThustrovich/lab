@@ -72,3 +72,7 @@ class Comment(models.Model):
         verbose_name="Комментарий"
         verbose_name_plural="Комментарии"
 
+
+class Counter(models.Model):
+    value = models.CharField(max_length=255, null=False, blank=False)
+    
