@@ -1,61 +1,39 @@
 import json
-from channels.generic.websocket import AsyncWebsocketConsumer
-import asyncio
-import os
-from asgiref.sync import sync_to_async
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "lab.settings")
+from channels.generic.websocket import WebsocketConsumer
+from asgiref.sync import async_to_sync
 
 
+class ChatConsumer(WebsocketConsumer):
+    def connect(self):
+        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        self.room_group_name = "chat_%s" % self.room_name
 
+        # Join room group
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name, self.channel_name
+        )
 
+        self.accept()
 
-@sync_to_async
-def get_value_from_database():
-    from shop.models import Counter
-    update_database_value()
-    return Counter.objects.get(id=1).value
+    def disconnect(self, close_code):
+        # Leave room group
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name, self.channel_name
+        )
 
-
-@sync_to_async
-def update_database_value():
-    from shop.models import Counter
-    counter = Counter.objects.filter(id=1)
-    return Counter.objects.filter(id=1).update(value=int(counter[0].value) + 1)
-
-
-
-
-
-
-
-class YourConsumer(AsyncWebsocketConsumer):
-    
-    async def connect(self):
-        await self.accept()
-        
-
-        # запускаем цикл для отправки данных каждую секунду
-        # while True:
-        await asyncio.sleep(1)
-        await update_database_value()
-        counter = await get_value_from_database()
-        data = {"counter": counter}
-        await self.send(json.dumps(data))
-        await asyncio.sleep(1)
-
-
-
-
-
-    async def disconnect(self, close_code):
-        print('disconnected ws')
-        pass
-
-    async def receive(self):
-        print('received ws')
+    # Receive message from WebSocket
+    def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        message = text_data_json['message']
+        message = text_data_json["message"]
 
-        await self.send(text_data=json.dumps({
-            'message': message
-        }))
+        # Send message to room group
+        async_to_sync(self.channel_layer.group_send)(
+            self.room_group_name, {"type": "chat_message", "message": message}
+        )
+
+    # Receive message from room group
+    def chat_message(self, event):
+        message = event["message"]
+
+        # Send message to WebSocket
+        self.send(text_data=json.dumps({"message": message}))
