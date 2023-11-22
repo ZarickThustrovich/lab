@@ -16,6 +16,14 @@ def set_session_state(session_uuid, is_active):
     current_session.is_active = is_active
     current_session.save()
 
+def create_chat_history(session_uuid, sender, message):
+    from .models import SessionChatHistory, Session
+    current_session = Session.objects.get(session_uuid=session_uuid)
+    SessionChatHistory.objects.create(
+        session=current_session,
+        sender=sender,
+        message=message,
+    )
 
 
 
