@@ -1,12 +1,35 @@
+import os
+import django
+# django.setup()
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'lab.settings')
+
 import json
 from channels.generic.websocket import WebsocketConsumer
 from asgiref.sync import async_to_sync
 
 
+
+
+def set_session_state(session_uuid, is_active):
+    from .models import Sessions
+    current_session = Sessions.objects.get(session_uuid=session_uuid)
+    current_session.is_active = is_active
+    current_session.save()
+
+
+
+
 class ChatConsumer(WebsocketConsumer):
     def connect(self):
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        from .models import Sessions
+        self.room_name = self.scope["url_route"]["kwargs"]["session_uuid"]
         self.room_group_name = "chat_%s" % self.room_name
+        current_session, created = Sessions.objects.get_or_create(session_uuid=self.room_name)
+        if (created):
+            current_session.is_active = True
+            current_session.save()
+        else:
+            set_session_state(self.room_name, True)
 
         # Join room group
         async_to_sync(self.channel_layer.group_add)(
@@ -17,6 +40,7 @@ class ChatConsumer(WebsocketConsumer):
 
     def disconnect(self, close_code):
         # Leave room group
+        set_session_state(self.room_name, False)
         async_to_sync(self.channel_layer.group_discard)(
             self.room_group_name, self.channel_name
         )

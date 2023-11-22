@@ -36,6 +36,7 @@ urlpatterns = [
     path('catalog/', views.get_books_catalog),
     path('get-book/<int:id>', views.get_specific_book),
     path('get-lot/<int:id>', views.get_specific_lot),
+    path('active_sessions', views.get_active_sessions),
 ]
 
 
