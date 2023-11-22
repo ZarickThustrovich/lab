@@ -108,6 +108,8 @@ DATABASES = {
     }
 }
 
+DATETIME_FORMAT="%Y-%m-%d%H:%M:%S"
+
 
 CHANNEL_LAYERS = {
     "default": {

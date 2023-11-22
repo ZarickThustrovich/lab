@@ -18,11 +18,13 @@ def set_session_state(session_uuid, is_active):
 
 def create_chat_history(session_uuid, sender, message):
     from .models import SessionChatHistory, Session
+    from datetime import datetime
     current_session = Session.objects.get(session_uuid=session_uuid)
     SessionChatHistory.objects.create(
         session=current_session,
         sender=sender,
         message=message,
+        datetime=datetime.now(),
     )
 
 
@@ -57,6 +59,8 @@ class ChatConsumer(WebsocketConsumer):
     def receive(self, text_data):
         text_data_json = json.loads(text_data)
         message = text_data_json["message"]
+        sender = text_data_json["sender"]
+        create_chat_history(self.room_name, sender, message)
 
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(

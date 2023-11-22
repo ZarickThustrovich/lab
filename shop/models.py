@@ -89,7 +89,8 @@ class Session(models.Model):
 class SessionChatHistory(models.Model):
     session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
     sender = models.CharField(max_length=255, null=False, blank=False)
-    message = models.CharField(max_length=255, null=False, blank=False)
+    message = models.CharField(max_length=255, null=True, blank=True)
+    datetime = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     
     class Meta:
         verbose_name="Отправитель"
