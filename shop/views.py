@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .models import Book, Lot, Sessions
+from .models import Book, Lot, Session
 
 
 def get_books_catalog(request):
@@ -23,5 +23,5 @@ def get_specific_lot(request, id):
         
 def get_active_sessions(request):
     if request.method == 'GET':
-        active_sessions = Sessions.objects.filter(is_active=True)
+        active_sessions = Session.objects.filter(is_active=True)
         return JsonResponse({'active_sessions': list(active_sessions)}, safe=False)

@@ -77,7 +77,7 @@ class Counter(models.Model):
     value = models.CharField(max_length=255, null=False, blank=False)
 
 
-class Sessions(models.Model):
+class Session(models.Model):
     session_uuid = models.CharField(max_length=255, null=False, blank=False)
     is_active = models.BooleanField(default=False)
     
@@ -87,7 +87,7 @@ class Sessions(models.Model):
         
 
 class SessionChatHistory(models.Model):
-    session_uuid = models.ForeignKey(Sessions, on_delete=models.DO_NOTHING)
+    session = models.ForeignKey(Session, on_delete=models.DO_NOTHING)
     sender = models.CharField(max_length=255, null=False, blank=False)
     
     class Meta:
